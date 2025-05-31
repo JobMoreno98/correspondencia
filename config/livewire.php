@@ -12,6 +12,12 @@ return [
     | finds components. It's also referenced by the file creation commands.
     |
     */
+'asset_url' => env('APP_URL', null)."/livewire/livewire.js",
+
+'update_route' => [
+    'enabled' => true,
+    'uri' => 'livewire/update',
+],
 
     'class_namespace' => 'App\\Livewire',
 
