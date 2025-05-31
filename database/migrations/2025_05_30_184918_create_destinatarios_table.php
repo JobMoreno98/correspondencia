@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('destinatarios', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo');
+            $table->string('codigo')->unique();
             $table->string('nombre');
             $table->string('dependencia');            
             $table->timestamps();

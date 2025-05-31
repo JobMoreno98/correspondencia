@@ -14,6 +14,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\TextInput\Mask;
 
 class DestinatarioResource extends Resource
 {
@@ -23,40 +24,37 @@ class DestinatarioResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                TextInput::make('codigo')->numeric()->maxLength(9)->required(),
-                TextInput::make('nombre')->required(),
-                TextInput::make('dependencia')->required(),
-            ]);
+        return $form->schema([
+            TextInput::make('codigo')
+                ->numeric()
+                ->maxLength(9)
+                ->required()
+                ->inputMode('decimal')
+                ->rules(['numeric'])->unique(),
+            TextInput::make('nombre')->required(),
+            TextInput::make('dependencia')->required(),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('codigo')->numeric()->sortable(),
-                TextColumn::make('nombre')->sortable(),
-                TextColumn::make('dependencia')->sortable(),
-            ])
+                TextColumn::make('codigo')->numeric()->sortable()->formatStateUsing(fn ($state) => rtrim(rtrim((string) $state, '0'), '.')), 
+                TextColumn::make('nombre')->sortable(), 
+                TextColumn::make('dependencia')->sortable()])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->actions([Tables\Actions\EditAction::make()])
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
-        ];
+                //
+            ];
     }
 
     public static function getPages(): array

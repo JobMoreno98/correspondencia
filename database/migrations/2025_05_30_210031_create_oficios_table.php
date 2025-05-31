@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('oficios', function (Blueprint $table) {
             $table->id();
             $table->string('num_oficio', 200);
-            $table->string('fecha_oficio');
-            $table->string('fecha_registro');
-            $table->string('fecha_vencimiento');
+            $table->date('fecha_oficio');
+            $table->date('fecha_registro');
+            $table->date('fecha_vencimiento');
             $table->enum('tipo', ['recibido', 'enviado']);
-            $table->unsignedBigInteger('envia_id');
+            $table->unsignedBigInteger('envia_id')->nullable();
 
             $table->foreign('envia_id')->references('id')->on('destinatarios');
 
-            $table->unsignedBigInteger('turna_id');
+            $table->unsignedBigInteger('turna_id')->nullable();
 
             $table->foreign('turna_id')->references('id')->on('destinatarios');
             $table->string('asunto');
