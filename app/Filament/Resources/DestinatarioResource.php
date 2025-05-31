@@ -10,11 +10,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\TextInput\Mask;
 
 class DestinatarioResource extends Resource
 {
@@ -46,7 +46,7 @@ class DestinatarioResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([Tables\Actions\EditAction::make(),ViewAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
@@ -63,6 +63,7 @@ class DestinatarioResource extends Resource
             'index' => Pages\ListDestinatarios::route('/'),
             'create' => Pages\CreateDestinatario::route('/create'),
             'edit' => Pages\EditDestinatario::route('/{record}/edit'),
+            'view' => Pages\ViewDestinatario::route('/{record}'),
         ];
     }
 }

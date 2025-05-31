@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -122,7 +123,7 @@ class OficiosResource extends Resource
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->codigo} - {$record->nombre} - ({$record->dependencia})")
                     ->searchable()
             ])
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([Tables\Actions\EditAction::make(),ViewAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
@@ -139,6 +140,7 @@ class OficiosResource extends Resource
             'index' => Pages\ListOficios::route('/'),
             'create' => Pages\CreateOficios::route('/create'),
             'edit' => Pages\EditOficios::route('/{record}/edit'),
+            'view' => Pages\ViewOficios::route('/{record}'),
         ];
     }
 }
