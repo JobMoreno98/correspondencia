@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Filament\Resources;
 
+use App\Exports\OficiosExport;
 use App\Filament\Resources\OficiosResource\Pages;
-use App\Filament\Resources\OficiosResource\RelationManagers;
 use App\Models\Oficios;
-use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
@@ -20,8 +18,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
 
 class OficiosResource extends Resource
 {
@@ -41,14 +39,14 @@ class OficiosResource extends Resource
                     Select::make('tipo')
                         ->options([
                             'recibido' => 'Recibido',
-                            'enviado' => 'Enviado',
+                            'enviado'  => 'Enviado',
                         ])
                         ->required(),
                     Select::make('estatus')
                         ->options([
                             'sin asignar' => 'Sin asignar',
-                            'asignado' => 'Asignado',
-                            'concluido' => 'Concluido',
+                            'asignado'    => 'Asignado',
+                            'concluido'   => 'Concluido',
                         ])
                         ->required(),
                 ]),
@@ -83,7 +81,7 @@ class OficiosResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Tables\Table $table): Tables\Table
     {
         return $table
             ->columns([
@@ -94,37 +92,79 @@ class OficiosResource extends Resource
                 TextColumn::make('fecha_registro'),
                 TextColumn::make('estatus')
                     ->formatStateUsing(fn($state) => match ($state) {
-                        'sin asignar' => 'Sin asignar',
-                        'asignado' => 'Asignado',
-                        'concluido' => 'Concluido',
-                        default => $state,
-                    })->colors([
-                        'danger' => 'sin asignar',
+                        'sin asignar'                 => 'Sin asignar',
+                        'asignado'                    => 'Asignado',
+                        'concluido'                   => 'Concluido',
+                        default                       => $state,
+                    })
+                    ->colors([
+                        'danger'  => 'sin asignar',
                         'primary' => 'asignado',
                         'success' => 'concluido',
-                    ])->badge()->searchable(),
+                    ])
+                    ->badge()
+                    ->searchable(),
             ])
-
             ->filters([
                 SelectFilter::make('estatus')
                     ->label('Filtrar por estatus')
                     ->options([
                         'sin asignar' => 'Sin asignar',
-                        'asignado' => 'Asignado',
-                        'concluido' => 'Concluido',
+                        'asignado'    => 'Asignado',
+                        'concluido'   => 'Concluido',
                     ]),
-                SelectFilter::make('enviar_id')
+                SelectFilter::make('envia_id')
                     ->label('Filtrar por enviado')
-                    ->relationship(
-                        'envia', // nombre del método de relación en tu modelo
-                        'nombre', // campo base (aunque luego lo sobreescribimos con getOptionLabelFromRecordUsing)
-                        modifyQueryUsing: fn($query) => $query->select('id', 'codigo', 'nombre', 'dependencia')
-                    )
-                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->codigo} - {$record->nombre} - ({$record->dependencia})")
-                    ->searchable()
+                    ->relationship('envia', 'nombre')
+                    ->searchable(),
+                Filter::make('fecha_registro_rango')
+                    ->label('Rango de Fechas')
+                    ->form([
+                        DatePicker::make('desde')->label('Desde'),
+                        DatePicker::make('hasta')->label('Hasta'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when($data['desde'], fn($q) => $q->whereDate('fecha_registro', '>=', $data['desde']))
+                            ->when($data['hasta'], fn($q) => $q->whereDate('fecha_registro', '<=', $data['hasta']));
+                    }),
+                Filter::make('registro_exacto')
+                    ->label('Fecha Exacta')
+                    ->form([
+                        DatePicker::make('fecha')->label('Fecha del Registro'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when($data['fecha'], fn($q) => $q->whereDate('fecha_registro', $data['fecha']));
+                    }),
             ])
-            ->actions([Tables\Actions\EditAction::make(),ViewAction::make()])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+                ExportBulkAction::make()
+                    ->exports([
+                        (new OficiosExport())
+                            ->withColumns([
+                                Column::make('id')->heading('ID'),
+                                Column::make('num_oficio')->heading('Número de Oficio'),
+                                Column::make('fecha_oficio')->heading('Fecha del Oficio'),
+                                Column::make('fecha_registro')->heading('Fecha de Registro'),
+                                Column::make('fecha_vencimiento')->heading('Fecha de Vencimiento'),
+                                Column::make('tipo')->heading('Tipo'),
+                                Column::make('envia.nombre')->heading('Envia'),
+                                Column::make('recibe.nombre')->heading('Turna a'),
+                                Column::make('asunto')->heading('Asunto'),
+                                Column::make('observaciones')->heading('Observaciones'),
+                                Column::make('archivado')->heading('Archivado'),
+                                Column::make('estatus')->heading('Estatus'),
+                            ]),
+                    ]),
+            ]);
     }
 
     public static function getRelations(): array
@@ -137,10 +177,11 @@ class OficiosResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOficios::route('/'),
+            'index'  => Pages\ListOficios::route('/'),
             'create' => Pages\CreateOficios::route('/create'),
-            'edit' => Pages\EditOficios::route('/{record}/edit'),
-            'view' => Pages\ViewOficios::route('/{record}'),
+            'edit'   => Pages\EditOficios::route('/{record}/edit'),
+            'view'   => Pages\ViewOficios::route('/{record}'),
         ];
     }
+
 }

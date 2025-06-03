@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class DestinatarioResource extends Resource
 {
@@ -40,14 +41,17 @@ class DestinatarioResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('codigo')->numeric()->sortable()->formatStateUsing(fn ($state) => rtrim(rtrim((string) $state, '0'), '.')), 
-                TextColumn::make('nombre')->sortable(), 
-                TextColumn::make('dependencia')->sortable()])
+                TextColumn::make('codigo')->numeric()->sortable()->formatStateUsing(fn ($state) => rtrim(rtrim((string) $state, '0'), '.'))->searchable(), 
+                TextColumn::make('nombre')->sortable()->searchable(), 
+                TextColumn::make('dependencia')->sortable()])->searchable()
             ->filters([
                 //
             ])
             ->actions([Tables\Actions\EditAction::make(),ViewAction::make()])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()]),
+                ExportBulkAction::make()
+            ]);
     }
 
     public static function getRelations(): array

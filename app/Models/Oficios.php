@@ -9,6 +9,7 @@ class Oficios extends Model
 {
     protected $table = 'oficios';
     protected $guarded = [];
+    
     public function envia(): BelongsTo
     {
         //dd(Oficios::with('envia')->first());
