@@ -7,5 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Destinatario extends Model
 {
     protected $guarded = [];
-     protected $table = 'destinatarios';
+    protected $table = 'destinatarios';
+    protected $casts = [
+        'red_udeg' => 'boolean',
+    ];
 }

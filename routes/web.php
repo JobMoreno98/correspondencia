@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('filament.admin.home');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
@@ -22,6 +22,3 @@ Route::middleware(['auth'])->group(function () {
 
 require __DIR__.'/auth.php';
 */
-Livewire::setUpdateRoute(function ($handle) {
-    return Route::post('/correspondencia/public/livewire/update', $handle);
-});

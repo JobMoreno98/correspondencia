@@ -7,6 +7,7 @@ use App\Filament\Resources\DestinatarioResource\RelationManagers;
 use App\Models\Destinatario;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -26,14 +27,11 @@ class DestinatarioResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            TextInput::make('codigo')
-                ->numeric()
-                ->maxLength(9)
-                ->required()
-                ->inputMode('decimal')
-                ->rules(['numeric'])->unique(),
             TextInput::make('nombre')->required(),
             TextInput::make('dependencia')->required(),
+            Toggle::make('red_udeg')->label('Externo CUCSH')->default(true)->inline()
+                ->onColor('success')
+                ->offColor('danger')
         ]);
     }
 
@@ -41,13 +39,14 @@ class DestinatarioResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('codigo')->numeric()->sortable()->formatStateUsing(fn ($state) => rtrim(rtrim((string) $state, '0'), '.'))->searchable(), 
-                TextColumn::make('nombre')->sortable()->searchable(), 
-                TextColumn::make('dependencia')->sortable()])->searchable()
+
+                TextColumn::make('nombre')->sortable()->searchable(),
+                TextColumn::make('dependencia')->sortable()
+            ])->searchable()
             ->filters([
                 //
             ])
-            ->actions([Tables\Actions\EditAction::make(),ViewAction::make()])
+            ->actions([Tables\Actions\EditAction::make(), ViewAction::make()])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()]),
                 ExportBulkAction::make()
@@ -57,8 +56,8 @@ class DestinatarioResource extends Resource
     public static function getRelations(): array
     {
         return [
-                //
-            ];
+            //
+        ];
     }
 
     public static function getPages(): array

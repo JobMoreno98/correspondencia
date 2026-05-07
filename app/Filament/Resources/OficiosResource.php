@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filament\Resources;
 
 use App\Exports\OficiosExport;
@@ -20,6 +21,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class OficiosResource extends Resource
 {
@@ -35,41 +37,31 @@ class OficiosResource extends Resource
                     'sm' => 3,
                 ])
                 ->schema([
-                    TextInput::make('num_oficio')->required(),
-                    Select::make('tipo')
-                        ->options([
-                            'recibido' => 'Recibido',
-                            'enviado'  => 'Enviado',
-                        ])
-                        ->required(),
+                    TextInput::make('num_oficio')->required()->label('Núm. Oficio'),
+                    /*
                     Select::make('estatus')
                         ->options([
                             'sin asignar' => 'Sin asignar',
                             'asignado'    => 'Asignado',
                             'concluido'   => 'Concluido',
                         ])
-                        ->required(),
-                ]),
-            Section::make('Fechas')
-                ->columns([
-                    'sm' => 3,
-                ])
-                ->schema([
+                        ->hidden()
+                        ->default('sin asignar')
+                        ->required(),*/
                     DatePicker::make('fecha_oficio')->required(),
                     DatePicker::make('fecha_registro')->readOnly()->default(now())->required(),
-                    DatePicker::make('fecha_vencimiento')
-                        ->default(now()->addDays(7))
-                        ->required(),
                 ]),
-
             Select::make('envia_id')
-                ->relationship(name: 'envia', modifyQueryUsing: fn($query) => $query->select('id', 'codigo', 'nombre', 'dependencia'))
-                ->getOptionLabelFromRecordUsing(fn($record) => "{$record->codigo} - {$record->nombre} - ({$record->dependencia})")
+                ->relationship(name: 'envia', modifyQueryUsing: fn($query) => $query->select('id',  'nombre', 'dependencia')->where('red_udeg', true)->orderBy('nombre'))
+                ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nombre} - ({$record->dependencia})")
                 ->searchable()->preload()->nullable()->required(),
 
-            Select::make('turna_id')->label('Turna a')->relationship(name: 'recibe', modifyQueryUsing: fn($query) => $query->select('id', 'codigo', 'nombre', 'dependencia'))->getOptionLabelFromRecordUsing(fn($record) => "{$record->codigo} - {$record->nombre} - ({$record->dependencia})")->searchable()->preload()->nullable()->required(),
+            Select::make('turna_id')->label('Turna a')
+                ->relationship(name: 'recibe', modifyQueryUsing: fn($query) => $query->select('id', 'nombre', 'dependencia')->where('red_udeg', false)->orderBy('nombre'))
+                ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nombre} - ({$record->dependencia})")
+                ->searchable()->preload()->nullable()->required(),
 
-            Textarea::make('asunto')->autosize()->required(),
+            Textarea::make('asunto')->autosize()->required()->columnSpanFull(),
             Textarea::make('observaciones')->autosize(),
             TextInput::make('archivado'),
 
@@ -85,11 +77,13 @@ class OficiosResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id'),
+                TextColumn::make('id')->label('ID'),
                 TextColumn::make('num_oficio')->label('Núm. Oficio')->searchable(),
-                TextColumn::make('envia.nombre')->searchable(),
-                TextColumn::make('recibe.nombre')->label('Turna a')->searchable(),
-                TextColumn::make('fecha_registro'),
+                TextColumn::make('envia.nombre')->searchable()->wrap(),
+                TextColumn::make('recibe.nombre')->label('Turna a')->searchable()->wrap(),
+                TextColumn::make('fecha_registro')->date('d-m-yy'),
+                TextColumn::make('asunto')->wrap()->limit(100)->searchable()
+                /*
                 TextColumn::make('estatus')
                     ->formatStateUsing(fn($state) => match ($state) {
                         'sin asignar'                 => 'Sin asignar',
@@ -103,16 +97,17 @@ class OficiosResource extends Resource
                         'success' => 'concluido',
                     ])
                     ->badge()
-                    ->searchable(),
+                    ->searchable(),*/
             ])
             ->filters([
+                /*
                 SelectFilter::make('estatus')
                     ->label('Filtrar por estatus')
                     ->options([
                         'sin asignar' => 'Sin asignar',
                         'asignado'    => 'Asignado',
                         'concluido'   => 'Concluido',
-                    ]),
+                    ]),*/
                 SelectFilter::make('envia_id')
                     ->label('Filtrar por enviado')
                     ->relationship('envia', 'nombre')
@@ -145,17 +140,32 @@ class OficiosResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+
                 ]),
+                ExportBulkAction::make()->exports([
+                    ExcelExport::make('form')->withColumns([
+                        Column::make('id')->heading('ID'),
+                        Column::make('num_oficio')->heading('Número de Oficio'),
+                        Column::make('fecha_oficio')->heading('Fecha del Oficio'),
+                        Column::make('fecha_registro')->heading('Fecha de Registro'),
+                        Column::make('envia.nombre')->heading('Envia'),
+                        Column::make('recibe.nombre')->heading('Turna a'),
+                        Column::make('asunto')->heading('Asunto'),
+                        Column::make('observaciones')->heading('Observaciones'),
+                        Column::make('archivado')->heading('Archivado'),
+                        //Column::make('estatus')->heading('Estatus'),
+                    ])->withWriterType(\Maatwebsite\Excel\Excel::XLSX),
+                ])
+                /*
                 ExportBulkAction::make()
                     ->exports([
+                        
                         (new OficiosExport())
                             ->withColumns([
                                 Column::make('id')->heading('ID'),
                                 Column::make('num_oficio')->heading('Número de Oficio'),
                                 Column::make('fecha_oficio')->heading('Fecha del Oficio'),
                                 Column::make('fecha_registro')->heading('Fecha de Registro'),
-                                Column::make('fecha_vencimiento')->heading('Fecha de Vencimiento'),
-                                Column::make('tipo')->heading('Tipo'),
                                 Column::make('envia.nombre')->heading('Envia'),
                                 Column::make('recibe.nombre')->heading('Turna a'),
                                 Column::make('asunto')->heading('Asunto'),
@@ -163,7 +173,7 @@ class OficiosResource extends Resource
                                 Column::make('archivado')->heading('Archivado'),
                                 Column::make('estatus')->heading('Estatus'),
                             ]),
-                    ]),
+                    ]),*/
             ]);
     }
 
@@ -183,5 +193,4 @@ class OficiosResource extends Resource
             'view'   => Pages\ViewOficios::route('/{record}'),
         ];
     }
-
 }

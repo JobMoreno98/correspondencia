@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('num_oficio', 200);
             $table->date('fecha_oficio');
             $table->date('fecha_registro');
-            $table->date('fecha_vencimiento');
-            $table->enum('tipo', ['recibido', 'enviado']);
+            //$table->date('fecha_vencimiento');
             $table->unsignedBigInteger('envia_id')->nullable();
 
             $table->foreign('envia_id')->references('id')->on('destinatarios');
