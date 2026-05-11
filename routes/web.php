@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ReporteController;
+use Filament\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -10,6 +12,12 @@ Route::get('/', function () {
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+
+
+Route::get('/generar-reporte', [ReporteController::class, 'reporte'])->name('reporte.pdf')->middleware( Authenticate::class);
+
+
 /*
 Route::middleware(['auth'])->group(function () {
 

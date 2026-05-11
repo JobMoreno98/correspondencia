@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Filament\Resources\OficiosResource\Pages;
 
 use App\Filament\Resources\OficiosResource;
 use Filament\Actions;
+use Filament\Actions\Action as ActionsAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,22 +27,6 @@ class ListOficios extends ListRecords
 
         return $query;
     }
-
-    // Aquí definimos el botón en el header de la tabla
-    protected function getTableHeaderActions(): array
-    {
-        return [
-            Action::make('registro_hoy')
-                ->label($this->filterRegistroHoy ? 'Mostrar todos' : 'Registrados Hoy')
-                ->color($this->filterRegistroHoy ? 'danger' : 'primary')
-                ->action(function () {
-                    $this->filterRegistroHoy = ! $this->filterRegistroHoy;
-                    $this->emitSelf('refreshTable');
-                }),
-        ];
-    }
-
-    // Listener para refrescar la tabla al cambiar filtro
     protected function getListeners(): array
     {
         return [
@@ -53,6 +39,26 @@ class ListOficios extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            ActionsAction::make('exportar')
+                ->label('Generar reporte')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('info')
+                ->url(function ($livewire) {
+
+                    $fecha = $livewire->getTableFilterState('fecha_registro_rango');
+                    $envia = $livewire->getTableFilterState('envia_id')['value'];
+                    $dia = $livewire->getTableFilterState('registro_exacto')['fecha'];
+
+                    return route('reporte.pdf', [
+                        'envia_id' => $envia,
+                        'fecha' => $fecha,
+                        'dia' => $dia
+                    ]);
+                })->visible(
+                    fn($livewire) =>
+                    filled($livewire->getTableFilterState('fecha_registro_rango'))
+                )
+                ->openUrlInNewTab(),
         ];
     }
 }
