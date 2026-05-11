@@ -33,7 +33,6 @@ class OficiosResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->openRecordUrlInNewTab()
             ->schema([
                 Section::make()
                     ->columns([
@@ -73,21 +72,7 @@ class OficiosResource extends Resource
                     ->downloadable()
                     ->acceptedFileTypes(['application/pdf'])
                     ->required(),
-            ])        ->headerActions([
-            Action::make('export')
-                ->label('Exportar PDF')
-                ->icon('heroicon-o-document-arrow-down')
-                ->action(function (array $data) {
-                    // lógica para exportar usando tus datos del formulario
-                    // por ejemplo llamar a dompdf
-                }),
-
-            Action::make('reset')
-                ->label('Reiniciar')
-                ->color('danger')
-                ->requiresConfirmation()
-                ->action(fn () => session()->flash('message', 'Formulario reiniciado')),
-        ]);
+            ])        ;
     }
 
     public static function table(Tables\Table $table): Tables\Table
