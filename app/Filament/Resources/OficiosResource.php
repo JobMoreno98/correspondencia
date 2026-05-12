@@ -71,7 +71,7 @@ class OficiosResource extends Resource
                     ->openable()
                     ->downloadable()
                     ->acceptedFileTypes(['application/pdf'])
-                    ->required(),
+                    //->required(),
             ])        ;
     }
 
