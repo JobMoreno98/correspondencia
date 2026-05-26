@@ -2,16 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\DestinatarioResource\Pages\ListDestinatarios;
+use App\Filament\Resources\DestinatarioResource\Pages\CreateDestinatario;
+use App\Filament\Resources\DestinatarioResource\Pages\EditDestinatario;
+use App\Filament\Resources\DestinatarioResource\Pages\ViewDestinatario;
 use App\Filament\Resources\DestinatarioResource\Pages;
 use App\Filament\Resources\DestinatarioResource\RelationManagers;
 use App\Models\Destinatario;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,11 +29,11 @@ class DestinatarioResource extends Resource
 {
     protected static ?string $model = Destinatario::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             TextInput::make('nombre')->required(),
             TextInput::make('dependencia')->required(),
             Toggle::make('red_udeg')->label('Externo CUCSH')->default(true)->inline()
@@ -46,9 +53,9 @@ class DestinatarioResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([Tables\Actions\EditAction::make(), ViewAction::make()])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()]),
+            ->recordActions([EditAction::make(), ViewAction::make()])
+            ->toolbarActions([
+                BulkActionGroup::make([DeleteBulkAction::make()]),
                 ExportBulkAction::make()
             ]);
     }
@@ -63,10 +70,10 @@ class DestinatarioResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDestinatarios::route('/'),
-            'create' => Pages\CreateDestinatario::route('/create'),
-            'edit' => Pages\EditDestinatario::route('/{record}/edit'),
-            'view' => Pages\ViewDestinatario::route('/{record}'),
+            'index' => ListDestinatarios::route('/'),
+            'create' => CreateDestinatario::route('/create'),
+            'edit' => EditDestinatario::route('/{record}/edit'),
+            'view' => ViewDestinatario::route('/{record}'),
         ];
     }
 }

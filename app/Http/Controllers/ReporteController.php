@@ -21,10 +21,11 @@ class ReporteController extends Controller
         if ($request->has('fecha.desde') && $request->has('fecha.hasta')) {
             $query->whereBetween('fecha_oficio', [$request->fecha['desde'], $request->fecha['hasta']]);
         }
-
-        // Filtrar por día específico
-        if ($request->filled('dia')) {
-            $query->whereDate('fecha_registro', $request->dia);
+        if ($request->filled('dia_inicio')) {
+            $query->whereDate('fecha_registro', '>=', $request->dia_inicio);
+        }
+        if ($request->filled('dia_fin')) {
+            $query->whereDate('fecha_registro', '<=', $request->dia_fin);
         }
 
         $resultados = $query->get();

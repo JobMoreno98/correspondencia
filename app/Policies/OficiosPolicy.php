@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Oficios;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class OficiosPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_oficios');
+        return $authUser->can('ViewAny:Oficios');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Oficios $oficios): bool
+    public function view(AuthUser $authUser, Oficios $oficios): bool
     {
-        return $user->can('view_oficios');
+        return $authUser->can('View:Oficios');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_oficios');
+        return $authUser->can('Create:Oficios');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Oficios $oficios): bool
+    public function update(AuthUser $authUser, Oficios $oficios): bool
     {
-        return $user->can('update_oficios');
+        return $authUser->can('Update:Oficios');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Oficios $oficios): bool
+    public function delete(AuthUser $authUser, Oficios $oficios): bool
     {
-        return $user->can('delete_oficios');
+        return $authUser->can('Delete:Oficios');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, Oficios $oficios): bool
     {
-        return $user->can('{{ DeleteAny }}');
+        return $authUser->can('Restore:Oficios');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, Oficios $oficios): bool
+    public function forceDelete(AuthUser $authUser, Oficios $oficios): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $authUser->can('ForceDelete:Oficios');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $authUser->can('ForceDeleteAny:Oficios');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, Oficios $oficios): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('{{ Restore }}');
+        return $authUser->can('RestoreAny:Oficios');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, Oficios $oficios): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $authUser->can('Replicate:Oficios');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, Oficios $oficios): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('{{ Replicate }}');
+        return $authUser->can('Reorder:Oficios');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('{{ Reorder }}');
-    }
 }

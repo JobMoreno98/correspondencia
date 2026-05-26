@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DestinatarioResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\DestinatarioResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -12,7 +13,7 @@ class ViewDestinatario extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make(),
         ];
     }
 }

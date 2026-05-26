@@ -2,21 +2,31 @@
 
 namespace App\Filament\Resources;
 
-
+use App\Exports\OficiosExport;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Tables\Table;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\OficiosResource\Pages\ListOficios;
+use App\Filament\Resources\OficiosResource\Pages\CreateOficios;
+use App\Filament\Resources\OficiosResource\Pages\EditOficios;
+use App\Filament\Resources\OficiosResource\Pages\ViewOficios;
 use App\Filament\Resources\OficiosResource\Pages;
 use App\Models\Oficios;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action as ActionsAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Actions\BulkActionGroup as ActionsBulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction as ActionsDeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -28,16 +38,13 @@ class OficiosResource extends Resource
 {
     protected static ?string $model = Oficios::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
-                    ->columns([
-                        'sm' => 3,
-                    ])
                     ->schema([
                         TextInput::make('num_oficio')->required()->label('Núm. Oficio'),
                         /*
@@ -52,7 +59,7 @@ class OficiosResource extends Resource
                         ->required(),*/
                         DatePicker::make('fecha_oficio')->required(),
                         DatePicker::make('fecha_registro')->readOnly()->default(now())->required(),
-                    ]),
+                    ])->columnSpanFull()->columns(3),
                 Select::make('envia_id')
                     ->relationship(name: 'envia', modifyQueryUsing: fn($query) => $query->select('id',  'nombre', 'dependencia')->where('red_udeg', true)->orderBy('nombre'))
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nombre} - ({$record->dependencia})")
@@ -71,11 +78,11 @@ class OficiosResource extends Resource
                     ->openable()
                     ->downloadable()
                     ->acceptedFileTypes(['application/pdf'])
-                    //->required(),
-            ])        ;
+                //->required(),
+            ]);
     }
 
-    public static function table(Tables\Table $table): Tables\Table
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -117,49 +124,44 @@ class OficiosResource extends Resource
 
                 Filter::make('fecha_registro_rango')
                     ->label('Rango de Fechas')
-                    ->form([
-                        DatePicker::make('desde')->label('Desde'),
-                        DatePicker::make('hasta')->label('Hasta'),
+                    ->schema([
+                        DatePicker::make('desde')->label('Fecha Oficio Desde'),
+                        DatePicker::make('hasta')->label('Fecha Oficio Hasta'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
                             ->when($data['desde'], fn($q) => $q->whereDate('fecha_registro', '>=', $data['desde']))
                             ->when($data['hasta'], fn($q) => $q->whereDate('fecha_registro', '<=', $data['hasta']));
                     }),
-                Filter::make('registro_exacto')
+                Filter::make('registro_inicio')
                     ->label('Fecha Exacta')
-                    ->form([
-                        DatePicker::make('fecha')->label('Fecha del Registro'),
+                    ->schema([
+                        DatePicker::make('fecha')->label('Fecha Registro Inicio'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
-                            ->when($data['fecha'], fn($q) => $q->whereDate('fecha_registro', $data['fecha']));
+                            ->when($data['fecha'], fn($q) => $q->whereDate('fecha_registro',  '>=', $data['fecha']));
+                    }),
+
+                Filter::make('registro_fin')
+                    ->label('Fecha Exacta')
+                    ->schema([
+                        DatePicker::make('fecha')->label('Fecha Registro fin'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when($data['fecha'], fn($q) => $q->whereDate('fecha_registro',  '<=', $data['fecha']));
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
                 ViewAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
-
-                ExportBulkAction::make()->exports([
-                    ExcelExport::make('form')->withColumns([
-                        Column::make('id')->heading('ID'),
-                        Column::make('num_oficio')->heading('Número de Oficio'),
-                        Column::make('fecha_oficio')->heading('Fecha del Oficio'),
-                        Column::make('fecha_registro')->heading('Fecha de Registro'),
-                        Column::make('envia.nombre')->heading('Envia'),
-                        Column::make('recibe.nombre')->heading('Turna a'),
-                        Column::make('asunto')->heading('Asunto'),
-                        Column::make('observaciones')->heading('Observaciones'),
-                        Column::make('archivado')->heading('Archivado'),
-                        //Column::make('estatus')->heading('Estatus'),
-                    ])->withWriterType(\Maatwebsite\Excel\Excel::XLSX),
-                ])
-                /*
+                
                 ExportBulkAction::make()
                     ->exports([
                         
@@ -176,7 +178,7 @@ class OficiosResource extends Resource
                                 Column::make('archivado')->heading('Archivado'),
                                 Column::make('estatus')->heading('Estatus'),
                             ]),
-                    ]),*/
+                    ]),
             ]);
     }
 
@@ -190,11 +192,10 @@ class OficiosResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListOficios::route('/'),
-            'create' => Pages\CreateOficios::route('/create'),
-            'edit'   => Pages\EditOficios::route('/{record}/edit'),
-            'view'   => Pages\ViewOficios::route('/{record}'),
+            'index'  => ListOficios::route('/'),
+            'create' => CreateOficios::route('/create'),
+            'edit'   => EditOficios::route('/{record}/edit'),
+            'view'   => ViewOficios::route('/{record}'),
         ];
     }
-    
 }

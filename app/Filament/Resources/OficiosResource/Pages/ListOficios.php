@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\OficiosResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\OficiosResource;
 use Filament\Actions;
 use Filament\Actions\Action as ActionsAction;
@@ -38,7 +39,7 @@ class ListOficios extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
             ActionsAction::make('exportar')
                 ->label('Generar reporte')
                 ->icon('heroicon-o-arrow-down-tray')
@@ -47,12 +48,14 @@ class ListOficios extends ListRecords
 
                     $fecha = $livewire->getTableFilterState('fecha_registro_rango');
                     $envia = $livewire->getTableFilterState('envia_id')['value'];
-                    $dia = $livewire->getTableFilterState('registro_exacto')['fecha'];
+                    $dia_inicio = $livewire->getTableFilterState('registro_inicio')['fecha'];
+                    $dia_fin = $livewire->getTableFilterState('registro_fin')['fecha'];
 
                     return route('reporte.pdf', [
                         'envia_id' => $envia,
                         'fecha' => $fecha,
-                        'dia' => $dia
+                        'dia_inicio' => $dia_inicio,
+                        'dia_fin' => $dia_fin
                     ]);
                 })->visible(
                     fn($livewire) =>

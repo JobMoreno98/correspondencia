@@ -13,6 +13,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
+        @page {
+            margin-top: 10px;
+            margin-bottom: 70px;
+            size: letter landscape;
+        }
+
         @font-face {
             font-family: 'Montserrat';
             font-style: normal;
@@ -27,60 +33,64 @@
             src: url('{{ asset('fonts/Montserrat-Bold.ttf') }}') format('truetype');
         }
 
-        @font-face {
-            font-family: 'Times New Roman';
-            font-style: normal;
-            font-weight: 700;
-            src: url('{{ asset('fonts/Times New Roman Bold.ttf') }}') format('truetype');
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 10pt;
-            color: #333;
-        }
-
-        @page {
-            margin-top: 5px;
-            ;
-            margin-bottom: 50mm;
-            size: letter landscape;
-        }
-
-        .bold-text {
-            font-weight: bold;
-        }
-
-        #header {
-            position: fixed;
-            top: 0px;
-            left: 0px;
-            right: 0px;
-            height: 50px;
-            line-height: 35px;
-        }
+        /* =========================
+       RESET
+    ========================== */
 
         * {
             margin-bottom: 0px !important;
         }
 
-        main {
-            margin-bottom: 40px !important;
+        body {
+            font-family: 'Montserrat', DejaVu Sans, sans-serif;
+            font-size: 12px;
+            color: #2d3748;
+        }
+
+        /* =========================
+       HEADER / FOOTER
+    ========================== */
+
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
         }
 
         #footer {
             position: fixed;
             bottom: 0;
+            left: 0;
+            right: 0;
             width: 100%;
             text-align: center;
-            border-top: 1px solid gray;
+            border-top: 1px solid #cbd5e0;
             padding-top: 5px;
             height: 1.5cm;
+            font-size: 10px;
+            color: #718096;
         }
 
+        main {
+            margin-top: 20px;
+            margin-bottom: 40px;
+             padding-bottom: 80px;
+        }
+
+        /* =========================
+       TEXTOS
+    ========================== */
+
         .titulo {
-            font-family: "Times New Roman", "Montserrat", serif;
-            font-size: 11pt;
+            font-family: "Times New Roman", serif;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .bold-text {
+            font-weight: bold;
         }
 
         .text-uppercase {
@@ -91,11 +101,15 @@
             text-align: center;
         }
 
-        <style>body {
-            font-family: DejaVu Sans, sans-serif;
-            color: #2d3748;
-            font-size: 12px;
+        .small {
+            font-size: 9px;
+            color: #6b7280;
+            margin-top: 3px;
         }
+
+        /* =========================
+       TABLA
+    ========================== */
 
         .table-container {
             width: 100%;
@@ -106,143 +120,137 @@
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
-            overflow: hidden;
-            border-radius: 8px;
+            table-layout: fixed;
         }
 
+        /* COLUMNAS */
+        .w-folio {
+            width: 8%;
+        }
+
+        .w-oficio {
+            width: 10%;
+        }
+
+        .w-fecha {
+            width: 12%;
+        }
+
+        .w-envia {
+            width: 20%;
+        }
+
+        .w-turna {
+            width: 20%;
+        }
+
+        .w-asunto {
+            width: 33%;
+        }
+
+        /* HEADERS */
         .modern-table thead th {
-            background: #1e3a5f;
+            background-color: #1e3a5f;
             color: #ffffff;
-            padding: 12px 10px;
-            text-align: left;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            border: 1px solid #d1d5db;
-        }
-
-        .modern-table tbody td {
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            vertical-align: top;
-        }
-
-        .modern-table tbody tr:nth-child(even) {
-            background: #f8fafc;
-        }
-
-        .modern-table tbody tr:nth-child(odd) {
-            background: #ffffff;
-        }
-
-        .modern-table tbody tr:hover {
-            background: #edf2f7;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .small {
+            padding: 8px;
             font-size: 10px;
-            color: #6b7280;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: left;
+            border: 1px solid #cbd5e0;
+
+            word-wrap: break-word;
+            word-break: break-word;
         }
+
+        /* CELDAS */
+        .modern-table tbody td {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            vertical-align: top;
+            font-size: 10px;
+            line-height: 1.4;
+
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        /* FILAS PARES */
+        .modern-table tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* FILAS IMPARES */
+        .modern-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        /* =========================
+       BADGE
+    ========================== */
 
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            background: #e0f2fe;
-            color: #0369a1;
-            border-radius: 4px;
-            font-size: 10px;
+            padding: 2px 6px;
+            background-color: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #93c5fd;
+            font-size: 9px;
             font-weight: bold;
         }
 
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            color: #2d3748;
-            font-size: 12px;
+        /* =========================
+       SALTOS DE PÁGINA
+    ========================== */
+
+        tr {
+            page-break-inside: avoid;
         }
 
-        .table-container {
-            width: 100%;
+        table {
+            page-break-inside: auto;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+
+        /* =========================
+       UTILIDADES
+    ========================== */
+
+        .mt-1 {
+            margin-top: 5px;
+        }
+
+        .mt-2 {
+            margin-top: 10px;
+        }
+
+        .mt-3 {
             margin-top: 15px;
         }
 
-        .modern-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-spacing: 0;
-            overflow: hidden;
-            border-radius: 8px;
+        .mb-1 {
+            margin-bottom: 5px;
         }
 
-        .modern-table thead th {
-            background: #1e3a5f;
-            color: #ffffff;
-            padding: 12px 10px;
-            text-align: left;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            border: 1px solid #d1d5db;
+        .mb-2 {
+            margin-bottom: 10px;
         }
 
-        .modern-table tbody td {
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            vertical-align: top;
-        }
-
-        .modern-table tbody tr:nth-child(even) {
-            background: #f8fafc;
-        }
-
-        .modern-table tbody tr:nth-child(odd) {
-            background: #ffffff;
-        }
-
-        .modern-table tbody tr:hover {
-            background: #edf2f7;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .small {
-            font-size: 10px;
-            color: #6b7280;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            background: #e0f2fe;
-            color: #0369a1;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
+        .mb-3 {
+            margin-bottom: 15px;
         }
     </style>
 </head>
 
 
 <body>
-    {{--  
-    <header id="header">
-        <div style="height: 100%">
-            <img src="{{ $img }}" height="100px" style="float:left;margin-right:20px; padding-right:20px;">
-            <p style="margin-top: 30px;line-height:.8;">
-                <span class="bold-text titulo">UNIVERSIDAD DE GUADALAJARA </span><br>
-                <span style="color:#7D91BE;font-size: 10pt;" class="bold-text"> CENTRO UNIVERSITARIO DE CIENCIAS
-                    SOCIALES Y HUMANIDADES</span> <br>
-                <span style="font-size: 8pt;">SECRETARÍA PRIVADA</span> <br>
-                <span style="font-size: 8pt;">OFICIALIA DE PARTES</span>
-            </p>
-        </div>
-    </header>
---}}
     <footer id="footer">
 
     </footer>
@@ -258,23 +266,19 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th width="5%" class="text-center"># Folio</th>
-                        <th width="15%">No. Oficio</th>
-                        <th width="12%">Fecha Oficio</th>
-                        <th width="26%">Dependencia</th>
-                        <th width="30%">Asunto</th>
+                        <th class="w-folio"># Folio</th>
+                        <th class="w-oficio">No. Oficio</th>
+                        <th class="w-fecha">Fecha Oficio</th>
+                        <th class="w-envia">Envia</th>
+                        <th class="w-turna">Turna</th>
+                        <th class="w-asunto">Asunto</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @foreach ($resultados as $item)
                         <tr>
-
-                            <td>
-                                <span class="badge">
-                                    {{ $item->id }}
-                                </span>
-                            </td>
+                            <td>{{ $item->id }}</td>
 
                             <td>
                                 {{ $item->num_oficio }}
@@ -286,8 +290,15 @@
 
                             <td>
                                 <strong>{{ $item->envia->nombre }}</strong>
-                                <div class="small">
+                                <div>
                                     {{ $item->envia->dependencia }}
+                                </div>
+                            </td>
+
+                            <td>
+                                <strong>{{ $item->recibe->nombre }}</strong>
+                                <div>
+                                    {{ $item->recibe->dependencia }}
                                 </div>
                             </td>
 
