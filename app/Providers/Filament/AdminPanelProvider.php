@@ -20,6 +20,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Support\Assets\Js;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -29,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->colors([
                 'primary' => Color::Purple,
@@ -55,6 +57,13 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])->plugins([
                 FilamentShieldPlugin::make(),
+            ])
+            ->assets([
+                // Cargamos Resumable.js de forma global y segura en el panel
+                Js::make('resumable-js', 'https://cdn.jsdelivr.net/npm/resumablejs@1.1.0/resumable.min.js'),
+
+                // Si tienes un CSS específico para tus formularios custom que compilaste con Vite:
+                // Css::make('custom-form-styles', asset('css/custom.css')),
             ])
             ->authMiddleware([
                 Authenticate::class,

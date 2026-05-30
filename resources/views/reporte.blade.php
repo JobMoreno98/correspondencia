@@ -15,6 +15,8 @@
     <style>
         @page {
             margin-top: 10px;
+            margin-left: 15px;
+            margin-right: 15px;
             margin-bottom: 70px;
             size: letter landscape;
         }
@@ -32,11 +34,6 @@
             font-weight: 700;
             src: url('{{ asset('fonts/Montserrat-Bold.ttf') }}') format('truetype');
         }
-
-        /* =========================
-       RESET
-    ========================== */
-
         * {
             margin-bottom: 0px !important;
         }
@@ -46,10 +43,6 @@
             font-size: 12px;
             color: #2d3748;
         }
-
-        /* =========================
-       HEADER / FOOTER
-    ========================== */
 
         #header {
             position: fixed;
@@ -76,7 +69,7 @@
         main {
             margin-top: 20px;
             margin-bottom: 40px;
-             padding-bottom: 80px;
+            padding-bottom: 80px;
         }
 
         /* =========================
@@ -145,7 +138,7 @@
         }
 
         .w-asunto {
-            width: 33%;
+            width: 30%;
         }
 
         /* HEADERS */

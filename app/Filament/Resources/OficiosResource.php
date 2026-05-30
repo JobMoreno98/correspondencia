@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Exports\OficiosExport;
+use App\Filament\Forms\Components\ChunkFileUpload;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Table;
@@ -14,25 +15,19 @@ use App\Filament\Resources\OficiosResource\Pages\ListOficios;
 use App\Filament\Resources\OficiosResource\Pages\CreateOficios;
 use App\Filament\Resources\OficiosResource\Pages\EditOficios;
 use App\Filament\Resources\OficiosResource\Pages\ViewOficios;
-use App\Filament\Resources\OficiosResource\Pages;
 use App\Models\Oficios;
-use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\Action as ActionsAction;
-use Filament\Tables\Actions\BulkActionGroup as ActionsBulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction as ActionsDeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use Illuminate\Support\Facades\Gate;
 
 class OficiosResource extends Resource
 {
@@ -74,10 +69,46 @@ class OficiosResource extends Resource
                 Textarea::make('observaciones')->autosize(),
                 TextInput::make('archivado'),
 
+
+                ChunkFileUpload::make('archivo')
+                    ->label('Subir documento')->extraAttributes(function ($record) {
+                    // Si el registro no existe (es modo creación), permitimos limpiar el input
+                    if (! $record) {
+                        return ['canDeleteFile' => true];
+                    }
+                    
+                    // En modo edición, verificamos la política de Shield para este registro
+                    return [
+                        'canDeleteFile' => Gate::allows('delete', $record)
+                    ];
+                })
+                   ,
+                /*
                 FileUpload::make('archivo')
-                    ->openable()
+                    ->openable()->maxSize(102400)
                     ->downloadable()
+                    ->acceptedFileTypes(['application/pdf']),
+                    
+
+                UppyUpload::make('archivo')
                     ->acceptedFileTypes(['application/pdf'])
+                    ->chunkSize(3 * 1024 * 1024)
+                    ->disk('public')
+                    ->directory('oficios')
+                    ->webcam(false)
+                    ->audio(false)
+                    ->theme('auto')
+                    ->dragDrop(true)
+                    ->nullable()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        logger()->info('STATE', [
+                            'state' => $state
+                        ]);
+
+                        if (empty($state)) {
+                            $set('archivo', null);
+                        }
+                    })->autoOpenFileEditor()   */
                 //->required(),
             ]);
     }
@@ -161,10 +192,9 @@ class OficiosResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-                
                 ExportBulkAction::make()
                     ->exports([
-                        
+
                         (new OficiosExport())
                             ->withColumns([
                                 Column::make('id')->heading('ID'),
