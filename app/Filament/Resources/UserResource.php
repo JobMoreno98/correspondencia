@@ -42,12 +42,14 @@ class UserResource extends Resource
                     ->required()
                     ->maxLength(255),
                 DateTimePicker::make('email_verified_at'),
+                
                 TextInput::make('password')
                     ->password()
                     ->required(fn(string $operation): bool => $operation === 'create')
                     ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
                     ->dehydrated(fn(?string $state): bool => filled($state))
                     ->maxLength(255),
+                    
                 CheckboxList::make('roles')
                     ->relationship('roles', 'name'),
 

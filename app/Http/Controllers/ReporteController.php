@@ -16,11 +16,15 @@ class ReporteController extends Controller
         if ($request->filled('envia_id')) {
             $query->where('envia_id', $request->envia_id);
         }
-
-        // Filtrar por rango de fechas
-        if ($request->has('fecha.desde') && $request->has('fecha.hasta')) {
-            $query->whereBetween('fecha_oficio', [$request->fecha['desde'], $request->fecha['hasta']]);
+        
+        if ($request->filled('fecha_registro_rango.desde')) {
+            $query->whereDate('fecha_registro', '>=', $request->fecha['desde']);
         }
+
+        if ($request->filled('fecha_registro_rango.hasta')) {
+            $query->whereDate('fecha_registro', '<=', $request->fecha['hasta']);
+        }
+
         if ($request->filled('dia_inicio')) {
             $query->whereDate('fecha_registro', '>=', $request->dia_inicio);
         }
