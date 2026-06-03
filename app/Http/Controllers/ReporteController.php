@@ -10,18 +10,18 @@ class ReporteController extends Controller
 {
     public function reporte(Request $request)
     {
+     
         $query = Oficios::query();
 
-        // Filtrar por envia_id
         if ($request->filled('envia_id')) {
             $query->where('envia_id', $request->envia_id);
         }
-        
-        if ($request->filled('fecha_registro_rango.desde')) {
+
+        if ($request->has('fecha.desde')) {
             $query->whereDate('fecha_registro', '>=', $request->fecha['desde']);
         }
 
-        if ($request->filled('fecha_registro_rango.hasta')) {
+        if ($request->has('fecha.hasta')) {
             $query->whereDate('fecha_registro', '<=', $request->fecha['hasta']);
         }
 

@@ -14,11 +14,7 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-
-
 Route::get('/generar-reporte', [ReporteController::class, 'reporte'])->name('reporte.pdf')->middleware( Authenticate::class);
-
-
 
 Route::post('/chunks/upload', [ChunkUploadController::class, 'upload'])->name('api.chunks.upload')->middleware( Authenticate::class);
 /*
