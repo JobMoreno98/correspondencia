@@ -18,11 +18,11 @@ class ReporteController extends Controller
         }
 
         if ($request->has('fecha.desde')) {
-            $query->whereDate('fecha_registro', '>=', $request->fecha['desde']);
+            $query->whereDate('fecha_oficio', '>=', $request->fecha['desde']);
         }
 
         if ($request->has('fecha.hasta')) {
-            $query->whereDate('fecha_registro', '<=', $request->fecha['hasta']);
+            $query->whereDate('fecha_oficio', '<=', $request->fecha['hasta']);
         }
 
         if ($request->filled('dia_inicio')) {
