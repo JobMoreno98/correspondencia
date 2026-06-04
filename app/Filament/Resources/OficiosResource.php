@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Exports\OficiosExport;
 use App\Filament\Forms\Components\ChunkFileUpload;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
@@ -17,7 +16,6 @@ use App\Filament\Resources\OficiosResource\Pages\EditOficios;
 use App\Filament\Resources\OficiosResource\Pages\ViewOficios;
 use App\Models\Oficios;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -28,6 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use Illuminate\Support\Facades\Gate;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class OficiosResource extends Resource
 {
@@ -72,17 +71,16 @@ class OficiosResource extends Resource
 
                 ChunkFileUpload::make('archivo')
                     ->label('Subir documento')->extraAttributes(function ($record) {
-                    // Si el registro no existe (es modo creación), permitimos limpiar el input
-                    if (! $record) {
-                        return ['canDeleteFile' => true];
-                    }
-                    
-                    // En modo edición, verificamos la política de Shield para este registro
-                    return [
-                        'canDeleteFile' => Gate::allows('delete', $record)
-                    ];
-                })
-                   ,
+                        // Si el registro no existe (es modo creación), permitimos limpiar el input
+                        if (! $record) {
+                            return ['canDeleteFile' => true];
+                        }
+
+                        // En modo edición, verificamos la política de Shield para este registro
+                        return [
+                            'canDeleteFile' => Gate::allows('delete', $record)
+                        ];
+                    }),
                 /*
                 FileUpload::make('archivo')
                     ->openable()->maxSize(102400)
@@ -164,24 +162,14 @@ class OficiosResource extends Resource
                             ->when($data['desde'], fn($q) => $q->whereDate('fecha_registro', '>=', $data['desde']))
                             ->when($data['hasta'], fn($q) => $q->whereDate('fecha_registro', '<=', $data['hasta']));
                     }),
-                Filter::make('registro_inicio')
+                Filter::make('registro_exacto')
                     ->label('Fecha Exacta')
-                    ->schema([
-                        DatePicker::make('fecha')->label('Fecha Registro Inicio'),
+                    ->form([
+                        DatePicker::make('fecha')->label('Fecha del Registro'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
-                            ->when($data['fecha'], fn($q) => $q->whereDate('fecha_registro',  '>=', $data['fecha']));
-                    }),
-
-                Filter::make('registro_fin')
-                    ->label('Fecha Exacta')
-                    ->schema([
-                        DatePicker::make('fecha')->label('Fecha Registro fin'),
-                    ])
-                    ->query(function ($query, array $data) {
-                        return $query
-                            ->when($data['fecha'], fn($q) => $q->whereDate('fecha_registro',  '<=', $data['fecha']));
+                            ->when($data['fecha'], fn($q) => $q->whereDate('fecha_registro', $data['fecha']));
                     }),
             ])
             ->recordActions([
@@ -192,6 +180,7 @@ class OficiosResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
+                /*
                 ExportBulkAction::make()
                     ->exports([
 
@@ -208,7 +197,21 @@ class OficiosResource extends Resource
                                 Column::make('archivado')->heading('Archivado'),
                                 Column::make('estatus')->heading('Estatus'),
                             ]),
-                    ]),
+                    ]),*/
+                ExportBulkAction::make()->exports([
+                    ExcelExport::make('form')->withColumns([
+                        Column::make('id')->heading('ID'),
+                        Column::make('num_oficio')->heading('Número de Oficio'),
+                        Column::make('fecha_oficio')->heading('Fecha del Oficio'),
+                        Column::make('fecha_registro')->heading('Fecha de Registro'),
+                        Column::make('envia.nombre')->heading('Envia'),
+                        Column::make('recibe.nombre')->heading('Turna a'),
+                        Column::make('asunto')->heading('Asunto'),
+                        Column::make('observaciones')->heading('Observaciones'),
+                        Column::make('archivado')->heading('Archivado'),
+                        //Column::make('estatus')->heading('Estatus'),
+                    ])->withWriterType(\Maatwebsite\Excel\Excel::XLSX),
+                ])
             ]);
     }
 

@@ -48,14 +48,12 @@ class ListOficios extends ListRecords
 
                     $fecha = $livewire->getTableFilterState('fecha_registro_rango');
                     $envia = $livewire->getTableFilterState('envia_id')['value'];
-                    $dia_inicio = $livewire->getTableFilterState('registro_inicio')['fecha'];
-                    $dia_fin = $livewire->getTableFilterState('registro_fin')['fecha'];
+                    $dia = $livewire->getTableFilterState('registro_exacto')['fecha'];
 
                     return route('reporte.pdf', [
                         'envia_id' => $envia,
                         'fecha' => $fecha,
-                        'dia_inicio' => $dia_inicio,
-                        'dia_fin' => $dia_fin
+                        'dia' => $dia
                     ]);
                 })->visible(
                     fn($livewire) =>
