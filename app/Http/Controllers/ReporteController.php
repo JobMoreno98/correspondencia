@@ -10,7 +10,7 @@ class ReporteController extends Controller
 {
     public function reporte(Request $request)
     {
-     
+
         $query = Oficios::query();
 
         if ($request->filled('envia_id')) {
@@ -23,6 +23,7 @@ class ReporteController extends Controller
 
         if ($request->has('fecha.hasta')) {
             $query->whereDate('fecha_oficio', '<=', $request->fecha['hasta']);
+            //return  $query->get();
         }
 
         if ($request->filled('dia_inicio')) {

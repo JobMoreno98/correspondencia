@@ -50,17 +50,21 @@ class OficiosResource extends Resource
                         ])
                         ->hidden()
                         ->default('sin asignar')
-                        ->required(),*/
-                        DatePicker::make('fecha_oficio')->required(),
+                        ->required(),
+                        git status
+                        */
+                        DatePicker::make('fecha_oficio')->required()->date()->minDate('1990-12-31'),
                         DatePicker::make('fecha_registro')->readOnly()->default(now())->required(),
                     ])->columnSpanFull()->columns(3),
                 Select::make('envia_id')
-                    ->relationship(name: 'envia', modifyQueryUsing: fn($query) => $query->select('id',  'nombre', 'dependencia')->where('red_udeg', true)->orderBy('nombre'))
+                    ->relationship(name: 'envia', modifyQueryUsing: fn($query) => $query->select('id',  'nombre', 'dependencia')
+                    ->orderBy('nombre'))
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nombre} - ({$record->dependencia})")
                     ->searchable()->preload()->nullable()->required(),
 
                 Select::make('turna_id')->label('Turna a')
-                    ->relationship(name: 'recibe', modifyQueryUsing: fn($query) => $query->select('id', 'nombre', 'dependencia')->where('red_udeg', false)->orderBy('nombre'))
+                    ->relationship(name: 'recibe', modifyQueryUsing: fn($query) => $query->select('id', 'nombre', 'dependencia')                    
+                    ->orderBy('nombre'))
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nombre} - ({$record->dependencia})")
                     ->searchable()->preload()->nullable()->required(),
 

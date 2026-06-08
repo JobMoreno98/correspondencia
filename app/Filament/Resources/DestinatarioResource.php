@@ -35,10 +35,8 @@ class DestinatarioResource extends Resource
     {
         return $schema->components([
             TextInput::make('nombre')->required(),
-            TextInput::make('dependencia')->required(),
-            Toggle::make('red_udeg')->label('Externo CUCSH')->default(true)->inline()
-                ->onColor('success')
-                ->offColor('danger')
+            TextInput::make('dependencia')->required()
+            //Toggle::make('red_udeg')->label('Externo CUCSH')->default(true)->inline()->onColor('success')->offColor('danger')
         ]);
     }
 

@@ -34,6 +34,7 @@
             font-weight: 700;
             src: url('{{ asset('fonts/Montserrat-Bold.ttf') }}') format('truetype');
         }
+
         * {
             margin-bottom: 0px !important;
         }
@@ -138,7 +139,7 @@
         }
 
         .w-asunto {
-            width: 30%;
+            width: 40%;
         }
 
         /* HEADERS */
@@ -151,19 +152,17 @@
             text-transform: uppercase;
             text-align: left;
             border: 1px solid #cbd5e0;
-
             word-wrap: break-word;
             word-break: break-word;
         }
 
         /* CELDAS */
         .modern-table tbody td {
-            padding: 8px;
+
             border: 1px solid #e2e8f0;
             vertical-align: top;
             font-size: 10px;
             line-height: 1.4;
-
             word-wrap: break-word;
             word-break: break-word;
         }
@@ -190,6 +189,8 @@
             border: 1px solid #93c5fd;
             font-size: 9px;
             font-weight: bold;
+            margin: auto;
+            vertical-align: middle;
         }
 
         /* =========================
@@ -271,7 +272,7 @@
                 <tbody>
                     @foreach ($resultados as $item)
                         <tr>
-                            <td>{{ $item->id }}</td>
+                            <td> <span class="badge">{{ $item->id }}</span></td>
 
                             <td>
                                 {{ $item->num_oficio }}
