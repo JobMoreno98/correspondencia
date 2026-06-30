@@ -16,6 +16,8 @@ use App\Filament\Resources\OficiosResource\Pages\EditOficios;
 use App\Filament\Resources\OficiosResource\Pages\ViewOficios;
 use App\Models\Oficios;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -38,8 +40,10 @@ class OficiosResource extends Resource
     {
         return $schema
             ->components([
+
                 Section::make()
                     ->schema([
+                        Placeholder::make('id')->label('Folio'),
                         TextInput::make('num_oficio')->required()->label('Núm. Oficio'),
                         /*
                     Select::make('estatus')
@@ -55,16 +59,16 @@ class OficiosResource extends Resource
                         */
                         DatePicker::make('fecha_oficio')->required()->date()->minDate('1990-12-31'),
                         DatePicker::make('fecha_registro')->readOnly()->default(now())->required(),
-                    ])->columnSpanFull()->columns(3),
+                    ])->columnSpanFull()->columns(4),
                 Select::make('envia_id')
                     ->relationship(name: 'envia', modifyQueryUsing: fn($query) => $query->select('id',  'nombre', 'dependencia')
-                    ->orderBy('nombre'))
+                        ->orderBy('nombre'))
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nombre} - ({$record->dependencia})")
                     ->searchable()->preload()->nullable()->required(),
 
                 Select::make('turna_id')->label('Turna a')
-                    ->relationship(name: 'recibe', modifyQueryUsing: fn($query) => $query->select('id', 'nombre', 'dependencia')                    
-                    ->orderBy('nombre'))
+                    ->relationship(name: 'recibe', modifyQueryUsing: fn($query) => $query->select('id', 'nombre', 'dependencia')
+                        ->orderBy('nombre'))
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nombre} - ({$record->dependencia})")
                     ->searchable()->preload()->nullable()->required(),
 
@@ -73,7 +77,8 @@ class OficiosResource extends Resource
                 TextInput::make('archivado'),
 
 
-                ChunkFileUpload::make('archivo')
+                ChunkFileUpload::make('archivo')->acceptedFileTypes(fn() => ['application/pdf'])
+                ->nullable()
                     ->label('Subir documento')->extraAttributes(function ($record) {
                         // Si el registro no existe (es modo creación), permitimos limpiar el input
                         if (! $record) {
@@ -90,7 +95,7 @@ class OficiosResource extends Resource
                     ->openable()->maxSize(102400)
                     ->downloadable()
                     ->acceptedFileTypes(['application/pdf']),
-                    
+                   
 
                 UppyUpload::make('archivo')
                     ->acceptedFileTypes(['application/pdf'])
@@ -119,12 +124,12 @@ class OficiosResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->label('ID')->sortable(),
-                TextColumn::make('num_oficio')->label('Núm. Oficio')->searchable()->sortable(),
-                TextColumn::make('envia.nombre')->searchable()->wrap()->sortable(),
+                TextColumn::make('id')->label('Folio')->sortable(),
+                TextColumn::make('num_oficio')->label('Núm. Oficio')->searchable()->sortable()->wrap(),
+                TextColumn::make('envia.nombre')->searchable()->wrap()->sortable()->wrap(),
                 TextColumn::make('recibe.nombre')->label('Turna a')->searchable()->wrap(),
                 TextColumn::make('fecha_registro')->date('d-m-yy')->sortable(),
-                TextColumn::make('asunto')->wrap()->limit(100)->searchable()
+                TextColumn::make('asunto')->wrap()->limit(150)->searchable()
                 /*
                 TextColumn::make('estatus')
                     ->formatStateUsing(fn($state) => match ($state) {
@@ -216,7 +221,7 @@ class OficiosResource extends Resource
                         //Column::make('estatus')->heading('Estatus'),
                     ])->withWriterType(\Maatwebsite\Excel\Excel::XLSX),
                 ])
-            ]);
+            ])->paginated([10, 25, 50, 'all']);
     }
 
     public static function getRelations(): array

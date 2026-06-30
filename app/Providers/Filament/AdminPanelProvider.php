@@ -21,6 +21,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Support\Assets\Js;
+use Filament\Support\Enums\Width;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -65,6 +66,7 @@ class AdminPanelProvider extends PanelProvider
                 // Si tienes un CSS específico para tus formularios custom que compilaste con Vite:
                 // Css::make('custom-form-styles', asset('css/custom.css')),
             ])
+            ->maxContentWidth(Width::Full)
             ->authMiddleware([
                 Authenticate::class,
             ]);
