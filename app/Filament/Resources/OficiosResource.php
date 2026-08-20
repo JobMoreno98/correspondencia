@@ -77,7 +77,7 @@ class OficiosResource extends Resource
                 TextInput::make('archivado'),
 
 
-                ChunkFileUpload::make('archivo')->acceptedFileTypes(fn() => ['application/pdf'])
+                ChunkFileUpload::make('archivo')->acceptedFileTypes(fn() => ['application/pdf','application/octet-stream','application/x-pdf'])
                 ->nullable()
                     ->label('Subir documento')->extraAttributes(function ($record) {
                         // Si el registro no existe (es modo creación), permitimos limpiar el input
